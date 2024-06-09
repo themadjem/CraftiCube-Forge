@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "crafticube:gold_crafticube"
+    },
+    "U": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    "UUU",
+    "UCU",
+    "UUU"
+  ],
+  "result": {
+    "item": "crafticube:diamond_crafticube"
+  },
+  "show_notification": true
+}

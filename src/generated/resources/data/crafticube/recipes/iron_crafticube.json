@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "crafticube:crafting_core"
+    },
+    "U": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "UUU",
+    "UCU",
+    "UUU"
+  ],
+  "result": {
+    "item": "crafticube:iron_crafticube"
+  },
+  "show_notification": true
+}

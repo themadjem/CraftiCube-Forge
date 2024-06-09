@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "tag": "forge:chests"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    },
+    "T": {
+      "item": "minecraft:cauldron"
+    }
+  },
+  "pattern": [
+    "CTC",
+    "TDT",
+    "CTC"
+  ],
+  "result": {
+    "item": "crafticube:crafting_core"
+  },
+  "show_notification": true
+}

@@ -1,0 +1,6 @@
+// 1.20.1	2024-06-09T18:13:46.0919949	Loot Tables
+1f0554c7ea541d7368d6a0506de11a0018a81d6d data/crafticube/loot_tables/blocks/crafticube.json
+da86f3902937670dc18334c79a32163472930e3d data/crafticube/loot_tables/blocks/diamond_crafticube.json
+ae02abda192efa1a8de928c1178a2875a06abae8 data/crafticube/loot_tables/blocks/gold_crafticube.json
+3844198415ef11abfa782dd58ce8adecb51ffb00 data/crafticube/loot_tables/blocks/iron_crafticube.json
+f2f33dca6b99183f9656f7a0740a168ad5b09868 data/crafticube/loot_tables/blocks/netherite_crafticube.json

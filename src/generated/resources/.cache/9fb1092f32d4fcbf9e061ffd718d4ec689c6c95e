@@ -1,0 +1,11 @@
+// 1.20.1	2024-06-09T18:22:04.4979722	Recipes
+b950ae27058e846a82a3b1447e9bb007c9e450a6 data/crafticube/advancements/recipes/misc/crafting_core.json
+1430dc3ba3314decc51ac66ca00d20a310d08e13 data/crafticube/advancements/recipes/misc/diamond_crafticube.json
+5c404293f710a7f2a7b0575efec06bfd2a3fb680 data/crafticube/advancements/recipes/misc/gold_crafticube.json
+32d06cfa904c4263fedbfe55ddd19bd71084a9bc data/crafticube/advancements/recipes/misc/iron_crafticube.json
+289300f338249772391cb57fbdfb9fc67aa5e6ee data/crafticube/advancements/recipes/misc/netherite_crafticube_smithing.json
+ace75ab20789d7f19f302151db47433083710fa0 data/crafticube/recipes/crafting_core.json
+4ea465949dc2120a219d2ef9d380b7f48169f80b data/crafticube/recipes/diamond_crafticube.json
+941a7bad985b0aa8624a8addddb48cc26b20dda7 data/crafticube/recipes/gold_crafticube.json
+a97dd3dc7d83788fdbb8727d03af00f148297620 data/crafticube/recipes/iron_crafticube.json
+07f302b496f35c845a9e1d1b6f53ff2bf1607a7e data/crafticube/recipes/netherite_crafticube_smithing.json
