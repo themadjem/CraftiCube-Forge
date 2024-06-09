@@ -40,8 +40,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         chestLikeUpgrade(consumer, ModItems.CRAFTING_CORE.get(), Items.IRON_INGOT, ModBlocks.IRON_CRAFTICUBE.get());
         chestLikeUpgrade(consumer, ModBlocks.IRON_CRAFTICUBE.get(), Items.GOLD_INGOT, ModBlocks.GOLD_CRAFTICUBE.get());
         chestLikeUpgrade(consumer, ModBlocks.GOLD_CRAFTICUBE.get(), Items.DIAMOND, ModBlocks.DIAMOND_CRAFTICUBE.get());
-
-        netheriteSmithing(consumer, ModBlocks.IRON_CRAFTICUBE.get(), RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get());
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get())
+                .requires(ModBlocks.DIAMOND_CRAFTICUBE.get())
+                .requires(Items.NETHERITE_INGOT)
+                .unlockedBy(getHasName(Items.NETHERITE_INGOT),has(Items.NETHERITE_INGOT))
+                .save(consumer);
+        //netheriteSmithing(consumer, ModBlocks.IRON_CRAFTICUBE.get(), RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get());
 
     }
 
