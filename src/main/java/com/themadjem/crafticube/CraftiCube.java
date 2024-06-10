@@ -2,6 +2,7 @@ package com.themadjem.crafticube;
 
 import com.mojang.logging.LogUtils;
 import com.themadjem.crafticube.block.ModBlocks;
+import com.themadjem.crafticube.block.entity.ModBlockEntities;
 import com.themadjem.crafticube.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,6 +29,7 @@ public class CraftiCube {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -42,7 +44,10 @@ public class CraftiCube {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS){
             event.accept(ModItems.CRAFTING_CORE);
-            event.accept(ModBlocks.CRAFTICUBE);
+            event.accept(ModBlocks.IRON_CRAFTICUBE);
+            event.accept(ModBlocks.GOLD_CRAFTICUBE);
+            event.accept(ModBlocks.DIAMOND_CRAFTICUBE);
+            event.accept(ModBlocks.NETHERITE_CRAFTICUBE);
         }
     }
 
@@ -60,4 +65,8 @@ public class CraftiCube {
 
         }
     }
+
+    public static void logInfo(String s){LOGGER.info(s);}
+    public static void logWarning(String s){LOGGER.warn(s);}
+    public static void logError(String s){LOGGER.error(s);}
 }

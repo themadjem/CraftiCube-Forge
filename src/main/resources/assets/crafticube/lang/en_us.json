@@ -1,4 +1,8 @@
 {
   "item.crafticube.crafting_core": "Crafting Core",
-  "block.crafticube.crafticube": "Crafti Cube"
+  "block.crafticube.crafticube": "Crafticube",
+  "block.crafticube.iron_crafticube": "Iron Crafticube",
+  "block.crafticube.gold_crafticube": "Gold Crafticube",
+  "block.crafticube.diamond_crafticube": "Diamond Crafticube",
+  "block.crafticube.netherite_crafticube": "Netherite Crafticube"
 }

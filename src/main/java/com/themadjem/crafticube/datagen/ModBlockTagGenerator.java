@@ -20,14 +20,17 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(
-                        ModBlocks.CRAFTICUBE.get(),
-                        ModBlocks.IRON_CRAFTICUBE.get(),
-                        ModBlocks.GOLD_CRAFTICUBE.get(),
-                        ModBlocks.DIAMOND_CRAFTICUBE.get(),
-                        ModBlocks.NETHERITE_CRAFTICUBE.get()
-                );
-
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(
+                ModBlocks.IRON_CRAFTICUBE.get(),
+                ModBlocks.GOLD_CRAFTICUBE.get(),
+                ModBlocks.DIAMOND_CRAFTICUBE.get(),
+                ModBlocks.NETHERITE_CRAFTICUBE.get()
+        );
+        this.tag(BlockTags.NEEDS_DIAMOND_TOOL).add(
+                ModBlocks.IRON_CRAFTICUBE.get(),
+                ModBlocks.GOLD_CRAFTICUBE.get(),
+                ModBlocks.DIAMOND_CRAFTICUBE.get(),
+                ModBlocks.NETHERITE_CRAFTICUBE.get()
+        );
     }
 }

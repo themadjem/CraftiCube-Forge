@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, CraftiCube.MOD_ID);
 
-    public static final RegistryObject<Block> CRAFTICUBE = registerBlock("crafticube",()->new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+//    public static final RegistryObject<Block> CRAFTICUBE = registerBlock("crafticube",()->new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> IRON_CRAFTICUBE = registerBlock("iron_crafticube",
             ()->new IronCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> GOLD_CRAFTICUBE = registerBlock("gold_crafticube",
@@ -29,7 +29,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> DIAMOND_CRAFTICUBE = registerBlock("diamond_crafticube",
             ()->new DiamondCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
     public static final RegistryObject<Block> NETHERITE_CRAFTICUBE = registerBlock("netherite_crafticube",
-            ()->new NetheriteCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
+            ()->new NetheriteCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
 
 
 
