@@ -66,6 +66,7 @@ public class CraftiCube {
         }
     }
 
+    public static void logDebug(String s){LOGGER.debug(s);}
     public static void logInfo(String s){LOGGER.info(s);}
     public static void logWarning(String s){LOGGER.warn(s);}
     public static void logError(String s){LOGGER.error(s);}
