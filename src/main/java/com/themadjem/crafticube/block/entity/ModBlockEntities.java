@@ -17,6 +17,21 @@ public class ModBlockEntities {
                     BlockEntityType.Builder.of(IronCrafticubeBlockEntity::new,
                             ModBlocks.IRON_CRAFTICUBE.get()).build(null)
             );
+    public static final RegistryObject<BlockEntityType<IronCrafticubeBlockEntity>> GOLD_CRAFTICUBE_BE =
+            BLOCK_ENTITIES.register("gold_crafticube_be", () ->
+                    BlockEntityType.Builder.of(IronCrafticubeBlockEntity::new,
+                            ModBlocks.GOLD_CRAFTICUBE.get()).build(null)
+            );
+    public static final RegistryObject<BlockEntityType<IronCrafticubeBlockEntity>> DIAMOND_CRAFTICUBE_BE =
+            BLOCK_ENTITIES.register("diamond_crafticube_be", () ->
+                    BlockEntityType.Builder.of(IronCrafticubeBlockEntity::new,
+                            ModBlocks.DIAMOND_CRAFTICUBE.get()).build(null)
+            );
+    public static final RegistryObject<BlockEntityType<IronCrafticubeBlockEntity>> NETHERITE_CRAFTICUBE_BE =
+            BLOCK_ENTITIES.register("netherite_crafticube_be", () ->
+                    BlockEntityType.Builder.of(IronCrafticubeBlockEntity::new,
+                            ModBlocks.NETHERITE_CRAFTICUBE.get()).build(null)
+            );
 
     public static void register (IEventBus eventBus){
         BLOCK_ENTITIES.register(eventBus);

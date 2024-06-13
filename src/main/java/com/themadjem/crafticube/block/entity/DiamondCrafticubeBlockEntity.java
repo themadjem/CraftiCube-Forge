@@ -1,10 +1,17 @@
 package com.themadjem.crafticube.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
-public class DiamondCrafticubeBlockEntity extends CrafticubeBlockEntity{
+public class DiamondCrafticubeBlockEntity extends CrafticubeBlockEntity {
     public DiamondCrafticubeBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.IRON_CRAFTICUBE_BE.get(),pPos, pBlockState, 26, 16_000);
+        super(ModBlockEntities.DIAMOND_CRAFTICUBE_BE.get(), pPos, pBlockState, 26, 16_000);
+    }
+
+    @Override
+    public @NotNull Component getName() {
+        return Component.translatable("block.crafticube.diamond_crafticube");
     }
 }

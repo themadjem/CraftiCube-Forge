@@ -3,6 +3,7 @@ package com.themadjem.crafticube.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class IronCrafticubeBlockEntity extends CrafticubeBlockEntity {
     public IronCrafticubeBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -10,7 +11,7 @@ public class IronCrafticubeBlockEntity extends CrafticubeBlockEntity {
     }
 
     @Override
-    public Component getDisplayName() {
+    public @NotNull Component getName() {
         return Component.translatable("block.crafticube.iron_crafticube");
     }
 }
