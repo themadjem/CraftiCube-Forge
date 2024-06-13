@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class DiamondCrafticubeBlockEntity extends CrafticubeBlockEntity {
     public DiamondCrafticubeBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.DIAMOND_CRAFTICUBE_BE.get(), pPos, pBlockState, 26, 16_000);
+        super(ModBlockEntities.DIAMOND_CRAFTICUBE_BE.get(), pPos, pBlockState, 27, 16_000);
     }
 
     @Override
