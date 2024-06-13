@@ -42,7 +42,7 @@ public class CraftiCube {
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS){
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.CRAFTING_CORE);
             event.accept(ModBlocks.IRON_CRAFTICUBE);
             event.accept(ModBlocks.GOLD_CRAFTICUBE);
@@ -66,8 +66,31 @@ public class CraftiCube {
         }
     }
 
-    public static void logDebug(String s){LOGGER.debug(s);}
-    public static void logInfo(String s){LOGGER.info(s);}
-    public static void logWarning(String s){LOGGER.warn(s);}
-    public static void logError(String s){LOGGER.error(s);}
+    public static void logDebug(String s) {
+        LOGGER.debug(s);
+    }
+
+    public static void logDebug(String s, Throwable t) {
+        LOGGER.debug(s, t);
+    }
+
+    public static void logInfo(String s) {
+        LOGGER.info(s);
+    }
+
+    public static void logWarning(String s) {
+        LOGGER.warn(s);
+    }
+
+    public static void logError(String s) {
+        LOGGER.error(s);
+    }
+
+    public static void logStackTrace() {
+        try {
+            throw new Exception();
+        } catch (Exception e) {
+            logDebug("Dummy Exception to get Stack Trace", e);
+        }
+    }
 }
