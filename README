@@ -1,0 +1,7 @@
+Designed for use in complex autocrafting systems allowing for both item and fluid input and output. 
+Each block has four fluid tanks of increasing sizes starting at four buckets at Iron tier and up to 32 buckets at Netherite tier!
+
+Iron Crafticubes: 9 item slots & four 4B tanks
+Gold Crafticubes: 18 item slots & four 8B tanks
+Diamond Crafticubes: 27 item slots & four 16B tanks
+Netherite Crafticubes: 32 item slots & four 32B tanks
