@@ -1,10 +1,13 @@
 package com.themadjem.crafticube.block.entity;
 
+import com.themadjem.crafticube.CraftiCube;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.*;
+import net.minecraft.world.Containers;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -12,17 +15,21 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
+public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
     public final int FLUID_LIMIT;
     private final ItemStackHandler itemHandler;
-    private LazyOptional<IItemHandlerModifiable> lazyItemHandler;
+    private LazyOptional<IItemHandler> lazyItemHandler;
+    private LazyOptional<IFluidHandler> lazyFluidHandler;
 
     private final FluidTank[] fluidTanks;
 
@@ -32,17 +39,21 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
         lazyItemHandler = LazyOptional.of(() -> this.itemHandler);
         FLUID_LIMIT = tankSize;
         fluidTanks = new FluidTank[]{
-                new FluidTank(FLUID_LIMIT),
-                new FluidTank(FLUID_LIMIT),
-                new FluidTank(FLUID_LIMIT),
-                new FluidTank(FLUID_LIMIT)
+                new CrafticubeFluidTank(FLUID_LIMIT, this),
+                new CrafticubeFluidTank(FLUID_LIMIT, this),
+                new CrafticubeFluidTank(FLUID_LIMIT, this),
+                new CrafticubeFluidTank(FLUID_LIMIT, this)
         };
+        lazyFluidHandler = LazyOptional.of(FluidHandler::new);
     }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (!this.remove && cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER)
+        if (cap == ForgeCapabilities.ITEM_HANDLER)
             return lazyItemHandler.cast();
+        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            return lazyFluidHandler.cast();
+        }
         return super.getCapability(cap, side);
     }
 
@@ -50,26 +61,47 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyItemHandler.invalidate();
+        lazyFluidHandler.invalidate();
     }
 
     @Override
     public void reviveCaps() {
         super.reviveCaps();
         lazyItemHandler = LazyOptional.of(() -> itemHandler);
+        lazyFluidHandler = LazyOptional.of(FluidHandler::new);
     }
 
     @Override
-    public void load(CompoundTag tag) {
+    public void load(@NotNull CompoundTag tag) {
         super.load(tag);
+        CraftiCube.logDebug("Loading CrafticubeBlockEntity");
         if (tag.contains("inv")) {
+            CraftiCube.logDebug(tag.getCompound("inv").toString());
             itemHandler.deserializeNBT(tag.getCompound("inv"));
+        }
+        for (int i = 0; i < fluidTanks.length; i++) {
+            String tankNo = "tank" + i;
+            if (tag.contains(tankNo)) {
+                fluidTanks[i].readFromNBT(tag.getCompound(tankNo));
+
+                CraftiCube.logDebug(tag.getCompound(tankNo).toString());
+            }
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.put("inv", itemHandler.serializeNBT());
+        CraftiCube.logDebug("Saving CrafticubeBlockEntity...");
+//        CraftiCube.logStackTrace();
+        CompoundTag items = itemHandler.serializeNBT();
+//        CraftiCube.logDebug(items.toString());
+        tag.put("inv", items);
+        for (int i = 0; i < fluidTanks.length; i++) {
+            CompoundTag fluidTag = fluidTanks[i].writeToNBT(new CompoundTag());
+//            CraftiCube.logDebug("Tank " + i + ": " + fluidTag.toString());
+            tag.put("tank" + i, fluidTag);
+        }
     }
 
     /*
@@ -84,6 +116,7 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
+        assert this.level != null;
         Containers.dropContents(this.level, this.worldPosition, inventory);
     }
 
@@ -96,7 +129,7 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
                 }
             }
             for (int i = 0; i < fluidTanks.length; i++) {
-                if(!fluidTanks[i].isEmpty()){
+                if (!fluidTanks[i].isEmpty()) {
                     pPlayer.sendSystemMessage(Component.literal("Tank " + i + ": " + fluidTanks[i].getFluidAmount() + "mB " + fluidTanks[i].getFluid().getDisplayName().getString()));
                 }
             }
@@ -104,7 +137,81 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable{
     }
 
     @Override
-    public Component getName() {
-        return null;
+    public @NotNull Component getName() {
+        return Component.literal("Generic Crafticube");
     }
+
+    private class FluidHandler implements IFluidHandler {
+        @Override
+        public int getTanks() {
+            return fluidTanks.length;
+        }
+
+        @Override
+        public @NotNull FluidStack getFluidInTank(int tank) {
+            return fluidTanks[tank].getFluid();
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return fluidTanks[tank].getCapacity();
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+            boolean fluidValid = fluidTanks[tank].isFluidValid(stack);
+            CraftiCube.logDebug("isFluidValid for " + stack.getDisplayName() + " in tank " + tank + ": " + fluidValid);
+            return fluidValid;
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            for (FluidTank tank : fluidTanks) {
+                if (tank.isFluidValid(resource)) {
+                    return tank.fill(resource, action);
+                }
+            }
+            return 0;
+        }
+
+        @Override
+        public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+            for (FluidTank tank : fluidTanks) {
+                if (tank.getFluid().isFluidEqual(resource)) {
+                    return tank.drain(resource, action);
+                }
+            }
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+            for (FluidTank tank : fluidTanks) {
+                FluidStack drained = tank.drain(maxDrain, action);
+                if (!drained.isEmpty()) {
+                    return drained;
+                }
+            }
+            return FluidStack.EMPTY;
+        }
+    }
+
+
+    private static class CrafticubeFluidTank extends FluidTank {
+        private final CrafticubeBlockEntity blockEntity;
+
+        public CrafticubeFluidTank(int capacity, CrafticubeBlockEntity blockEntity) {
+            super(capacity);
+            this.blockEntity = blockEntity;
+        }
+
+        @Override
+        protected void onContentsChanged() {
+            super.onContentsChanged();
+            if (blockEntity != null) {
+                blockEntity.setChanged(); // Mark the block entity as needing to be saved
+            }
+        }
+    }
+
 }
