@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
 public class CrafticubeBlock extends BaseEntityBlock {
@@ -39,19 +40,18 @@ public class CrafticubeBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        /* Don't need this if not implementing menu */
-        if (pLevel.isClientSide) {
-            return InteractionResult.SUCCESS;
-        } else {
+        if (!pLevel.isClientSide) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof CrafticubeBlockEntity) {
-                ((CrafticubeBlockEntity) blockEntity).printContents(pLevel, pPlayer);
-//                pPlayer.openMenu((CrafticubeBlockEntity)blockentity);
-//                pPlayer.awardStat(Stats.OPEN_BARREL);
-//                PiglinAi.angerNearbyPiglins(pPlayer, true);
+            if (blockEntity instanceof CrafticubeBlockEntity crafticubeBlockEntity) {
+                if (FluidUtil.interactWithFluidHandler(pPlayer, pHand, pLevel, pPos, pHit.getDirection())) {
+                    crafticubeBlockEntity.setChanged();
+                    return InteractionResult.SUCCESS;
+                } else {
+                    crafticubeBlockEntity.printContents(pLevel, pPlayer);
+                }
             }
-            return InteractionResult.CONSUME;
         }
+        return InteractionResult.CONSUME;
     }
 
 
