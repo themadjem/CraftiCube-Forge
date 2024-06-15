@@ -32,12 +32,6 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 ModBlocks.DIAMOND_CRAFTICUBE.get(),
                 ModBlocks.NETHERITE_CRAFTICUBE.get()
         );
-			this.tag(BlockTags.NEEDS_GOLD_TOOL).add(
-                ModBlocks.IRON_CRAFTICUBE.get(),
-                ModBlocks.GOLD_CRAFTICUBE.get(),
-                ModBlocks.DIAMOND_CRAFTICUBE.get(),
-                ModBlocks.NETHERITE_CRAFTICUBE.get()
-        );
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL).add(
                 ModBlocks.IRON_CRAFTICUBE.get(),
                 ModBlocks.GOLD_CRAFTICUBE.get(),

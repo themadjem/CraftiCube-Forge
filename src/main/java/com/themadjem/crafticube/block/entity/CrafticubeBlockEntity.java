@@ -1,6 +1,7 @@
 package com.themadjem.crafticube.block.entity;
 
 import com.themadjem.crafticube.CraftiCube;
+import com.themadjem.crafticube.block.custom.CrafticubeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -49,10 +50,13 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER)
-            return lazyItemHandler.cast();
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
-            return lazyFluidHandler.cast();
+        if (!this.remove) {
+            if (cap == ForgeCapabilities.ITEM_HANDLER) {
+                return lazyItemHandler.cast();
+            }
+            if (cap == ForgeCapabilities.FLUID_HANDLER) {
+                return lazyFluidHandler.cast();
+            }
         }
         return super.getCapability(cap, side);
     }
@@ -104,6 +108,19 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
         }
     }
 
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (this.level != null) {
+            BlockState blockState = this.level.getBlockState(this.worldPosition);
+            boolean shouldPower = this.isEmpty();
+            if (blockState.getValue(CrafticubeBlock.POWERED) != shouldPower) {
+                this.level.setBlock(worldPosition, blockState.setValue(CrafticubeBlock.POWERED, shouldPower), 3);
+                this.level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            }
+        }
+    }
+
     /*
      * This does not drop fluids.
      *
@@ -139,6 +156,23 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
     @Override
     public @NotNull Component getName() {
         return Component.literal("Generic Crafticube");
+    }
+
+    public boolean isEmpty() {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack item = itemHandler.getStackInSlot(i);
+            if (!item.isEmpty()) {
+                CraftiCube.logDebug("Item Present, not empty");
+                return false;
+            }
+        }
+        for (FluidTank tank : fluidTanks) {
+            if (!tank.isEmpty()) {
+                CraftiCube.logDebug("Fluid Present, not empty");
+                return false;
+            }
+        }
+        return true;
     }
 
     private class FluidHandler implements IFluidHandler {

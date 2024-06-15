@@ -7,17 +7,46 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
-public class CrafticubeBlock extends BaseEntityBlock {
+public class CrafticubeBlock extends BaseEntityBlock implements EntityBlock {
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+
+
     public CrafticubeBlock(Properties pProporites) {
         super(pProporites);
+        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, Boolean.FALSE));
     }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(POWERED);
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+    @Override
+    public int getAnalogOutputSignal(BlockState blockState, Level world, BlockPos pos) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof CrafticubeBlockEntity) {
+            CrafticubeBlockEntity crafticube = (CrafticubeBlockEntity) blockEntity;
+            return crafticube.isEmpty() ? 15 : 0;
+        }
+        return 0;
+    }
+
 
     @Override
     public RenderShape getRenderShape(BlockState pState) {
