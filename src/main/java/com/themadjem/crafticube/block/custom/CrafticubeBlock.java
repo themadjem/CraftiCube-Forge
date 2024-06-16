@@ -16,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -48,16 +47,21 @@ public class CrafticubeBlock extends BaseEntityBlock {
         if (!pState.is(pNewState.getBlock())) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof CrafticubeBlockEntity crafticube) {
-                ItemStack itemStack = new ItemStack(this);
-                CompoundTag nbt = new CompoundTag();
-                if (crafticube.hasCustomName()) {
-                    CompoundTag name = new CompoundTag();
-                    name.putString("Name", Component.Serializer.toJson(crafticube.getCustomName()));
-                    nbt.put("display", name);
+                Player player = pLevel.getNearestPlayer(
+                        pPos.getX(), pPos.getY(), pPos.getZ(), 10, false
+                );
+                if (player != null && !player.isCreative()) {
+                    ItemStack itemStack = new ItemStack(this);
+                    CompoundTag nbt = new CompoundTag();
+                    if (crafticube.hasCustomName()) {
+                        CompoundTag name = new CompoundTag();
+                        name.putString("Name", Component.Serializer.toJson(crafticube.getCustomName()));
+                        nbt.put("display", name);
+                    }
+                    crafticube.saveAdditionalToTag(nbt);
+                    itemStack.setTag(nbt);
+                    Containers.dropContents(pLevel, pPos, new SimpleContainer(itemStack));
                 }
-                crafticube.saveAdditionalToTag(nbt);
-                itemStack.setTag(nbt);
-                Containers.dropContents(pLevel, pPos, new SimpleContainer(itemStack));
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
@@ -90,7 +94,7 @@ public class CrafticubeBlock extends BaseEntityBlock {
                     crafticubeBlockEntity.setChanged();
                     return InteractionResult.SUCCESS;
                 } else {
-                    if(pPlayer.getItemInHand(pHand).is(ModItems.CRAFTING_CORE.get())) {
+                    if (pPlayer.getItemInHand(pHand).is(ModItems.CRAFTING_CORE.get())) {
                         crafticubeBlockEntity.printContents(pLevel, pPlayer);
                     }
                 }
