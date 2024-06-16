@@ -43,7 +43,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get())
                 .requires(ModBlocks.DIAMOND_CRAFTICUBE.get())
                 .requires(Items.NETHERITE_INGOT)
-                .unlockedBy(getHasName(Items.NETHERITE_INGOT),has(Items.NETHERITE_INGOT))
+                .unlockedBy(getHasName(Items.NETHERITE_INGOT), has(Items.NETHERITE_INGOT))
                 .save(consumer);
         //netheriteSmithing(consumer, ModBlocks.IRON_CRAFTICUBE.get(), RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get());
 
@@ -146,4 +146,5 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlocks("has_netherite_ingot", has((ItemLike) Items.NETHERITE_INGOT))
                 .save(pFinishedRecipeConsumer, CraftiCube.MOD_ID + ":" + getItemName(pResultItem) + "_smithing");
     }
+
 }

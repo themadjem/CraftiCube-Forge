@@ -1,6 +1,7 @@
 package com.themadjem.crafticube.block.custom;
 
 import com.themadjem.crafticube.block.entity.CrafticubeBlockEntity;
+import com.themadjem.crafticube.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -89,7 +90,9 @@ public class CrafticubeBlock extends BaseEntityBlock {
                     crafticubeBlockEntity.setChanged();
                     return InteractionResult.SUCCESS;
                 } else {
-                    crafticubeBlockEntity.printContents(pLevel, pPlayer);
+                    if(pPlayer.getItemInHand(pHand).is(ModItems.CRAFTING_CORE.get())) {
+                        crafticubeBlockEntity.printContents(pLevel, pPlayer);
+                    }
                 }
             }
         }
