@@ -1,6 +1,7 @@
 package com.themadjem.crafticube.block.entity;
 
 import com.themadjem.crafticube.CraftiCube;
+import com.themadjem.crafticube.block.custom.CrafticubeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -25,34 +26,39 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
     public final int FLUID_LIMIT;
     private final ItemStackHandler itemHandler;
     private LazyOptional<IItemHandler> lazyItemHandler;
     private LazyOptional<IFluidHandler> lazyFluidHandler;
 
-    private final FluidTank[] fluidTanks;
+    private final CrafticubeFluidTank[] fluidTanks;
 
     public CrafticubeBlockEntity(BlockEntityType<? extends CrafticubeBlockEntity> blockEntityType, BlockPos pPos, BlockState pBlockState, int invSlots, int tankSize) {
         super(blockEntityType, pPos, pBlockState);
         itemHandler = new ItemStackHandler(invSlots);
         lazyItemHandler = LazyOptional.of(() -> this.itemHandler);
         FLUID_LIMIT = tankSize;
-        fluidTanks = new FluidTank[]{
+        fluidTanks = new CrafticubeFluidTank[]{
                 new CrafticubeFluidTank(FLUID_LIMIT, this),
                 new CrafticubeFluidTank(FLUID_LIMIT, this),
                 new CrafticubeFluidTank(FLUID_LIMIT, this),
                 new CrafticubeFluidTank(FLUID_LIMIT, this)
         };
-        lazyFluidHandler = LazyOptional.of(FluidHandler::new);
+        lazyFluidHandler = LazyOptional.of(CrafticubeFluidHandler::new);
     }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER)
-            return lazyItemHandler.cast();
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
-            return lazyFluidHandler.cast();
+        if (!this.remove) {
+            if (cap == ForgeCapabilities.ITEM_HANDLER) {
+                return lazyItemHandler.cast();
+            }
+            if (cap == ForgeCapabilities.FLUID_HANDLER) {
+                return lazyFluidHandler.cast();
+            }
         }
         return super.getCapability(cap, side);
     }
@@ -68,7 +74,7 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
     public void reviveCaps() {
         super.reviveCaps();
         lazyItemHandler = LazyOptional.of(() -> itemHandler);
-        lazyFluidHandler = LazyOptional.of(FluidHandler::new);
+        lazyFluidHandler = LazyOptional.of(CrafticubeFluidHandler::new);
     }
 
     @Override
@@ -141,7 +147,24 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
         return Component.literal("Generic Crafticube");
     }
 
-    private class FluidHandler implements IFluidHandler {
+    public boolean isEmpty() {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack item = itemHandler.getStackInSlot(i);
+            if (!item.isEmpty()) {
+                CraftiCube.logDebug("Item Present, not empty");
+                return false;
+            }
+        }
+        for (FluidTank tank : fluidTanks) {
+            if (!tank.isEmpty()) {
+                CraftiCube.logDebug("Fluid Present, not empty");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private class CrafticubeFluidHandler implements IFluidHandler {
         @Override
         public int getTanks() {
             return fluidTanks.length;
@@ -166,11 +189,31 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            for (FluidTank tank : fluidTanks) {
-                if (tank.isFluidValid(resource)) {
-                    return tank.fill(resource, action);
+            // List to keep track of potential fill results
+            ArrayList<TankFillResult> results = new ArrayList<>();
+
+            // Iterate over each tank and simulate the fill process
+            for (int i = 0; i < fluidTanks.length; i++) {
+                CrafticubeFluidTank tank = fluidTanks[i];
+
+                if (tank.isEmpty() || tank.getFluid().isFluidEqual(resource)) {
+                    results.add(new TankFillResult(i, tank.fill(resource, FluidAction.SIMULATE)));
+                } else {
+                    results.add(new TankFillResult(i, 0));
                 }
             }
+
+            // Process the simulation results
+            for (TankFillResult result : results) {
+                if (result.result > 0) {
+                    // If not simulating, perform the actual fill
+                    if (action.execute()) {
+                        return fluidTanks[result.index].fill(resource, action);
+                    }
+                    return result.result;
+                }
+            }
+
             return 0;
         }
 
@@ -186,6 +229,8 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
 
         @Override
         public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+            // Add simulation check
+
             for (FluidTank tank : fluidTanks) {
                 FluidStack drained = tank.drain(maxDrain, action);
                 if (!drained.isEmpty()) {
@@ -193,6 +238,16 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
                 }
             }
             return FluidStack.EMPTY;
+        }
+
+        private static class TankFillResult {
+            int index;
+            int result;
+
+            TankFillResult(int idx, int res) {
+                this.index = idx;
+                this.result = res;
+            }
         }
     }
 
