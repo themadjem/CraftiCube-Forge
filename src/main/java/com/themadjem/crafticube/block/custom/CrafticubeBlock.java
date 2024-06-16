@@ -2,17 +2,29 @@ package com.themadjem.crafticube.block.custom;
 
 import com.themadjem.crafticube.block.entity.CrafticubeBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CrafticubeBlock extends BaseEntityBlock {
     public CrafticubeBlock(Properties pProporites) {
@@ -20,22 +32,52 @@ public class CrafticubeBlock extends BaseEntityBlock {
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState pState) {
+    public @NotNull RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
-        /* For now, drop any contained Items and void any Fluids */
+    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder pParams) {
+        super.getDrops(pState, pParams);
+        return new ArrayList<>();
+    }
 
-        if (pState.getBlock() != pNewState.getBlock()) {
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
+        if (!pState.is(pNewState.getBlock())) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof CrafticubeBlockEntity) {
-                ((CrafticubeBlockEntity) blockEntity).dropContents();
+            if (blockEntity instanceof CrafticubeBlockEntity crafticube) {
+                ItemStack itemStack = new ItemStack(this);
+                CompoundTag nbt = new CompoundTag();
+                if (crafticube.hasCustomName()) {
+                    CompoundTag name = new CompoundTag();
+                    name.putString("Name", Component.Serializer.toJson(crafticube.getCustomName()));
+                    nbt.put("display", name);
+                }
+                crafticube.saveAdditionalToTag(nbt);
+                itemStack.setTag(nbt);
+                Containers.dropContents(pLevel, pPos, new SimpleContainer(itemStack));
+            }
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
+    }
+
+    @Override
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        if (pStack.hasTag()) {
+            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+            if (blockEntity instanceof CrafticubeBlockEntity crafticube) {
+                crafticube.load(pStack.getTag());
             }
         }
 
-        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
+        if (pStack.hasCustomHoverName()) {
+            BlockEntity blockentity = pLevel.getBlockEntity(pPos);
+            if (blockentity instanceof CrafticubeBlockEntity crafticubeBlockEntity) {
+                crafticubeBlockEntity.setCustomName(pStack.getHoverName());
+            }
+        }
+
     }
 
     @Override

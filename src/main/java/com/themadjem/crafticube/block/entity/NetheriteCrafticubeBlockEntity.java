@@ -11,7 +11,7 @@ public class NetheriteCrafticubeBlockEntity extends CrafticubeBlockEntity {
     }
 
     @Override
-    public @NotNull Component getName() {
+    public @NotNull Component getDefaultName() {
         return Component.translatable("block.crafticube.netherite_crafticube");
     }
 }

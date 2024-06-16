@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.world.Containers;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.SimpleContainer;
@@ -27,8 +28,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
+    private Component name;
     public final int FLUID_LIMIT;
     private final ItemStackHandler itemHandler;
     private LazyOptional<IItemHandler> lazyItemHandler;
@@ -93,21 +96,28 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
                 CraftiCube.logDebug(tag.getCompound(tankNo).toString());
             }
         }
+        if (tag.contains("CustomName", 8)) {
+            this.name = Component.Serializer.fromJson(tag.getString("CustomName"));
+        }
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
         CraftiCube.logDebug("Saving CrafticubeBlockEntity...");
-//        CraftiCube.logStackTrace();
         CompoundTag items = itemHandler.serializeNBT();
-//        CraftiCube.logDebug(items.toString());
         tag.put("inv", items);
         for (int i = 0; i < fluidTanks.length; i++) {
             CompoundTag fluidTag = fluidTanks[i].writeToNBT(new CompoundTag());
-//            CraftiCube.logDebug("Tank " + i + ": " + fluidTag.toString());
             tag.put("tank" + i, fluidTag);
         }
+        if (this.name != null) {
+            tag.putString("CustomName", Component.Serializer.toJson(this.name));
+        }
+    }
+
+    public void saveAdditionalToTag(CompoundTag tag){
+        saveAdditional(tag);
     }
 
     /*
@@ -142,9 +152,27 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
         }
     }
 
+    public void setCustomName(Component pName) {
+        this.name = pName;
+    }
+
+    @Nullable
+    @Override
+    public Component getCustomName() {
+        return name;
+    }
+
     @Override
     public @NotNull Component getName() {
+        return this.name != null ? this.name : this.getDefaultName();
+    }
+
+    public Component getDefaultName() {
         return Component.literal("Generic Crafticube");
+    }
+    @Override
+    public @NotNull Component getDisplayName() {
+        return this.getName();
     }
 
     public boolean isEmpty() {

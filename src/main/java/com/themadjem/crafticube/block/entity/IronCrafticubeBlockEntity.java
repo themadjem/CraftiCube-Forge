@@ -11,7 +11,7 @@ public class IronCrafticubeBlockEntity extends CrafticubeBlockEntity {
     }
 
     @Override
-    public @NotNull Component getName() {
+    public Component getDefaultName() {
         return Component.translatable("block.crafticube.iron_crafticube");
     }
 }
