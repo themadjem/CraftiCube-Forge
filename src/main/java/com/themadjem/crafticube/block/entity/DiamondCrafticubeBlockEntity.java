@@ -10,8 +10,8 @@ public class DiamondCrafticubeBlockEntity extends CrafticubeBlockEntity {
         super(ModBlockEntities.DIAMOND_CRAFTICUBE_BE.get(), pPos, pBlockState, 27, 16_000);
     }
 
-    @Override
-    public @NotNull Component getDefaultName() {
-        return Component.translatable("block.crafticube.diamond_crafticube");
-    }
+//    @Override
+//    public @NotNull Component getDefaultName() {
+//        return Component.translatable("block.crafticube.diamond_crafticube");
+//    }
 }

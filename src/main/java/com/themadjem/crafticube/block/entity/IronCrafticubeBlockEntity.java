@@ -10,8 +10,8 @@ public class IronCrafticubeBlockEntity extends CrafticubeBlockEntity {
         super(ModBlockEntities.IRON_CRAFTICUBE_BE.get(), pPos, pBlockState, 9, 4_000);
     }
 
-    @Override
-    public Component getDefaultName() {
-        return Component.translatable("block.crafticube.iron_crafticube");
-    }
+//    @Override
+//    public Component getDefaultName() {
+//        return Component.translatable("block.crafticube.iron_crafticube");
+//    }
 }

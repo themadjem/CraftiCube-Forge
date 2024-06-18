@@ -1,19 +1,25 @@
 package com.themadjem.crafticube.block.custom;
 
+import com.mojang.serialization.MapCodec;
+import com.themadjem.crafticube.block.ModBlocks;
 import com.themadjem.crafticube.block.entity.CrafticubeBlockEntity;
 import com.themadjem.crafticube.item.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentHolder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,10 +31,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class CrafticubeBlock extends BaseEntityBlock {
+    public static final MapCodec<CrafticubeBlock> CODEC = simpleCodec(CrafticubeBlock::new);
+
     public CrafticubeBlock(Properties pProporites) {
         super(pProporites);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -52,14 +67,23 @@ public class CrafticubeBlock extends BaseEntityBlock {
                 );
                 if (player != null && !player.isCreative()) {
                     ItemStack itemStack = new ItemStack(this);
-                    CompoundTag nbt = new CompoundTag();
-                    if (crafticube.hasCustomName()) {
-                        CompoundTag name = new CompoundTag();
-                        name.putString("Name", Component.Serializer.toJson(crafticube.getCustomName()));
-                        nbt.put("display", name);
-                    }
-                    crafticube.saveAdditionalToTag(nbt);
-                    itemStack.setTag(nbt);
+//                    CompoundTag nbt = new CompoundTag();
+//                    if (crafticube.hasCustomName()) {
+//                        CompoundTag name = new CompoundTag();
+//
+//                        // I have no idea if this section will work
+//                        ResourceKey<? extends Registry<Block>> blockRegistryKey = ModBlocks.BLOCKS.getRegistryKey();
+//                        Registry<Block> blockRegistry = pLevel.registryAccess().registryOrThrow(blockRegistryKey);
+//                        HolderLookup.RegistryLookup<Block> blockLookup = blockRegistry.asLookup();
+//                        HolderLookup.Provider provider = HolderLookup.Provider.create(Stream.of(blockLookup));
+//                        // ChatGPT came up with this, so blame them
+//
+//                        name.putString("Name", Component.Serializer.toJson(crafticube.getCustomName(),provider));
+//                        nbt.put("display", name);
+//                    }
+//
+//                    crafticube.saveAdditionalToTag(nbt);
+//                    itemStack.setTag(nbt);
                     Containers.dropContents(pLevel, pPos, new SimpleContainer(itemStack));
                 }
             }
@@ -69,30 +93,32 @@ public class CrafticubeBlock extends BaseEntityBlock {
 
     @Override
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        if (pStack.hasTag()) {
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof CrafticubeBlockEntity crafticube) {
-                crafticube.load(pStack.getTag());
-            }
-        }
-
-        if (pStack.hasCustomHoverName()) {
-            BlockEntity blockentity = pLevel.getBlockEntity(pPos);
-            if (blockentity instanceof CrafticubeBlockEntity crafticubeBlockEntity) {
-                crafticubeBlockEntity.setCustomName(pStack.getHoverName());
-            }
-        }
+        // Don't need custom name handling anymore?
+        //        if (pStack.get(DataComponents.CUSTOM_NAME)) {
+//            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+//            if (blockEntity instanceof CrafticubeBlockEntity crafticube) {
+//                crafticube.load(pStack.getTag());
+//            }
+//        }
+//
+//        if (pStack.hasCustomName()) {
+//            BlockEntity blockentity = pLevel.getBlockEntity(pPos);
+//            if (blockentity instanceof CrafticubeBlockEntity crafticubeBlockEntity) {
+//                crafticubeBlockEntity.setCustomName(pStack.getHoverName());
+//            }
+//        }
+        Component data = pStack.get(DataComponents.CUSTOM_NAME);
 
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public ItemInteractionResult useItemOn(ItemStack pStack,BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof CrafticubeBlockEntity crafticubeBlockEntity) {
                 if (FluidUtil.interactWithFluidHandler(pPlayer, pHand, pLevel, pPos, pHit.getDirection())) {
                     crafticubeBlockEntity.setChanged();
-                    return InteractionResult.SUCCESS;
+                    return ItemInteractionResult.SUCCESS;
                 } else {
                     if (pPlayer.getItemInHand(pHand).is(ModItems.CRAFTING_CORE.get())) {
                         crafticubeBlockEntity.printContents(pLevel, pPlayer);
@@ -100,7 +126,7 @@ public class CrafticubeBlock extends BaseEntityBlock {
                 }
             }
         }
-        return InteractionResult.CONSUME;
+        return ItemInteractionResult.CONSUME;
     }
 
 

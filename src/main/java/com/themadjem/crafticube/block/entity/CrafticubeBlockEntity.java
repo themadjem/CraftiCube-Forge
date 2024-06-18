@@ -4,9 +4,14 @@ import com.themadjem.crafticube.CraftiCube;
 import com.themadjem.crafticube.block.custom.CrafticubeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.SimpleContainer;
@@ -30,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
+public class CrafticubeBlockEntity extends BlockEntity /*implements Nameable*/ {
     private Component name;
     public final int FLUID_LIMIT;
     private final ItemStackHandler itemHandler;
@@ -81,59 +86,46 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag pTag, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(pTag, pRegistries);
         CraftiCube.logDebug("Loading CrafticubeBlockEntity");
-        if (tag.contains("inv")) {
-            CraftiCube.logDebug(tag.getCompound("inv").toString());
-            itemHandler.deserializeNBT(tag.getCompound("inv"));
+        CraftiCube.logDebug(pTag.toString());
+        if (pTag.contains("Inventory")) {
+            CraftiCube.logDebug(pTag.getCompound("Inventory").toString());
+            itemHandler.deserializeNBT(pTag.getCompound("Inventory"));
         }
+
         for (int i = 0; i < fluidTanks.length; i++) {
             String tankNo = "tank" + i;
-            if (tag.contains(tankNo)) {
-                fluidTanks[i].readFromNBT(tag.getCompound(tankNo));
+            if (pTag.contains(tankNo)) {
+                fluidTanks[i].readFromNBT(pTag.getCompound(tankNo));
 
-                CraftiCube.logDebug(tag.getCompound(tankNo).toString());
+                CraftiCube.logDebug(pTag.getCompound(tankNo).toString());
             }
         }
-        if (tag.contains("CustomName", 8)) {
-            this.name = Component.Serializer.fromJson(tag.getString("CustomName"));
+        if (pTag.contains("CustomName", 8)) {
+            this.name = Component.Serializer.fromJson(pTag.getString("CustomName"), pRegistries);
         }
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(@NotNull CompoundTag pTag, HolderLookup.Provider pRegistries) {
+        super.saveAdditional(pTag, pRegistries);
         CraftiCube.logDebug("Saving CrafticubeBlockEntity...");
-        CompoundTag items = itemHandler.serializeNBT();
-        tag.put("inv", items);
+        Tag items = itemHandler.serializeNBT(pRegistries);
+        pTag.put("Inventory", items);
         for (int i = 0; i < fluidTanks.length; i++) {
             CompoundTag fluidTag = fluidTanks[i].writeToNBT(new CompoundTag());
-            tag.put("tank" + i, fluidTag);
+            pTag.put("tank" + i, fluidTag);
         }
         if (this.name != null) {
-            tag.putString("CustomName", Component.Serializer.toJson(this.name));
+            pTag.putString("CustomName", Component.Serializer.toJson(this.name, pRegistries));
         }
+        CraftiCube.logDebug(pTag.toString());
     }
 
-    public void saveAdditionalToTag(CompoundTag tag){
-        saveAdditional(tag);
-    }
-
-    /*
-     * This does not drop fluids.
-     *
-     * I also am not sure if I want it to drop its contents or keep it,
-     * it is expensive to craft, so having it be able to
-     * keep its inventory on pickup is feasable
-     * */
-    public void dropContents() {
-        SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
-        }
-        assert this.level != null;
-        Containers.dropContents(this.level, this.worldPosition, inventory);
+    public void saveAdditionalToTag(CompoundTag pTag, HolderLookup.Provider pRegistries) {
+        saveAdditional(pTag, pRegistries);
     }
 
     public void printContents(Level pLevel, Player pPlayer) {
@@ -152,28 +144,29 @@ public class CrafticubeBlockEntity extends BlockEntity implements Nameable {
         }
     }
 
-    public void setCustomName(Component pName) {
-        this.name = pName;
-    }
-
-    @Nullable
-    @Override
-    public Component getCustomName() {
-        return name;
-    }
-
-    @Override
-    public @NotNull Component getName() {
-        return this.name != null ? this.name : this.getDefaultName();
-    }
-
-    public Component getDefaultName() {
-        return Component.literal("Generic Crafticube");
-    }
-    @Override
-    public @NotNull Component getDisplayName() {
-        return this.getName();
-    }
+//    public void setCustomName(Component pName) {
+//        this.name = pName;
+//    }
+//
+//    @Nullable
+//    @Override
+//    public Component getCustomName() {
+//        return name;
+//    }
+//
+//    @Override
+//    public @NotNull Component getName() {
+//        return this.name != null ? this.name : this.getDefaultName();
+//    }
+//
+//    public Component getDefaultName() {
+//        return Component.literal("Generic Crafticube");
+//    }
+//
+//    @Override
+//    public @NotNull Component getDisplayName() {
+//        return this.getName();
+//    }
 
     public boolean isEmpty() {
         for (int i = 0; i < itemHandler.getSlots(); i++) {

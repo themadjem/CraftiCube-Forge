@@ -1,5 +1,6 @@
 package com.themadjem.crafticube.block.entity;
 
+import com.mojang.datafixers.types.Type;
 import com.themadjem.crafticube.CraftiCube;
 import com.themadjem.crafticube.block.ModBlocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;

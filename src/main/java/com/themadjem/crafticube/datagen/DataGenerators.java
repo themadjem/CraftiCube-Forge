@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(modid=CraftiCube.MOD_ID, bus=Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = CraftiCube.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
@@ -20,15 +20,15 @@ public class DataGenerators {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(),new ModRecipeProvider(packOutput));
-        generator.addProvider(event.includeServer(),ModLootTableProvider.create(packOutput));
+        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, lookupProvider));
+//        generator.addProvider(event.includeServer(),ModLootTableProvider.create(packOutput));
 
-        generator.addProvider(event.includeClient(),new ModBlockStateProvider(packOutput, existingFileHelper));
-        generator.addProvider(event.includeClient(),new ModItemModelProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
 
         ModBlockTagGenerator blockTagGenerator = generator.addProvider(event.includeServer(),
-                new ModBlockTagGenerator(packOutput,lookupProvider,existingFileHelper));
+                new ModBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
 
-        generator.addProvider(event.includeServer(), new ModItemTagGenerator(packOutput,lookupProvider,blockTagGenerator.contentsGetter(),existingFileHelper));
+        generator.addProvider(event.includeServer(), new ModItemTagGenerator(packOutput, lookupProvider, blockTagGenerator.contentsGetter(), existingFileHelper));
     }
 }

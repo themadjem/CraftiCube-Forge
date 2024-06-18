@@ -21,17 +21,14 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, CraftiCube.MOD_ID);
 
-//    public static final RegistryObject<Block> CRAFTICUBE = registerBlock("crafticube",()->new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> IRON_CRAFTICUBE = registerBlock("iron_crafticube",
-            ()->new IronCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+            ()->new IronCrafticubeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> GOLD_CRAFTICUBE = registerBlock("gold_crafticube",
-            ()->new GoldCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.GOLD_BLOCK)));
+            ()->new GoldCrafticubeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK)));
     public static final RegistryObject<Block> DIAMOND_CRAFTICUBE = registerBlock("diamond_crafticube",
-            ()->new DiamondCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
+            ()->new DiamondCrafticubeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.DIAMOND_BLOCK)));
     public static final RegistryObject<Block> NETHERITE_CRAFTICUBE = registerBlock("netherite_crafticube",
-            ()->new NetheriteCrafticubeBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
-
-
+            ()->new NetheriteCrafticubeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.DIAMOND_BLOCK)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
@@ -42,7 +39,6 @@ public class ModBlocks {
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {
         return ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
-
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

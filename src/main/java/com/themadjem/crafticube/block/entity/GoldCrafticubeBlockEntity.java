@@ -10,8 +10,8 @@ public class GoldCrafticubeBlockEntity extends CrafticubeBlockEntity {
         super(ModBlockEntities.GOLD_CRAFTICUBE_BE.get(), pPos, pBlockState, 18, 8_000);
     }
 
-    @Override
-    public @NotNull Component getDefaultName() {
-        return Component.translatable("block.crafticube.gold_crafticube");
-    }
+//    @Override
+//    public @NotNull Component getDefaultName() {
+//        return Component.translatable("block.crafticube.gold_crafticube");
+//    }
 }

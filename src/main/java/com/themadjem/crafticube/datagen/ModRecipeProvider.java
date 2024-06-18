@@ -3,30 +3,25 @@ package com.themadjem.crafticube.datagen;
 import com.themadjem.crafticube.CraftiCube;
 import com.themadjem.crafticube.block.ModBlocks;
 import com.themadjem.crafticube.item.ModItems;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
-    public ModRecipeProvider(PackOutput pOutput) {
-        super(pOutput);
+    public ModRecipeProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pRegistries) {
+        super(pOutput, pRegistries);
     }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
+    protected void buildRecipes(RecipeOutput pRecipeOutput) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CRAFTING_CORE.get())
                 .pattern("CTC")
                 .pattern("TDT")
@@ -35,21 +30,21 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('T', Blocks.CAULDRON)
                 .define('D', Tags.Items.GEMS_DIAMOND)
                 .unlockedBy(getHasName(Items.DIAMOND), has(Tags.Items.GEMS_DIAMOND))
-                .save(consumer);
+                .save(pRecipeOutput);
 
-        chestLikeUpgrade(consumer, ModItems.CRAFTING_CORE.get(), Items.IRON_INGOT, ModBlocks.IRON_CRAFTICUBE.get());
-        chestLikeUpgrade(consumer, ModBlocks.IRON_CRAFTICUBE.get(), Items.GOLD_INGOT, ModBlocks.GOLD_CRAFTICUBE.get());
-        chestLikeUpgrade(consumer, ModBlocks.GOLD_CRAFTICUBE.get(), Items.DIAMOND, ModBlocks.DIAMOND_CRAFTICUBE.get());
+        chestLikeUpgrade(pRecipeOutput, ModItems.CRAFTING_CORE.get(), Items.IRON_INGOT, ModBlocks.IRON_CRAFTICUBE.get());
+        chestLikeUpgrade(pRecipeOutput, ModBlocks.IRON_CRAFTICUBE.get(), Items.GOLD_INGOT, ModBlocks.GOLD_CRAFTICUBE.get());
+        chestLikeUpgrade(pRecipeOutput, ModBlocks.GOLD_CRAFTICUBE.get(), Items.DIAMOND, ModBlocks.DIAMOND_CRAFTICUBE.get());
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get())
                 .requires(ModBlocks.DIAMOND_CRAFTICUBE.get())
                 .requires(Items.NETHERITE_INGOT)
                 .unlockedBy(getHasName(Items.NETHERITE_INGOT), has(Items.NETHERITE_INGOT))
-                .save(consumer);
-        //netheriteSmithing(consumer, ModBlocks.IRON_CRAFTICUBE.get(), RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get());
+                .save(pRecipeOutput);
+        //netheriteSmithing(pRecipeOutput, ModBlocks.IRON_CRAFTICUBE.get(), RecipeCategory.MISC, ModBlocks.NETHERITE_CRAFTICUBE.get());
 
     }
 
-    protected static void chestLikeUpgrade(Consumer<FinishedRecipe> pFinishedRecipeConsumer, ItemLike pCenterItem, ItemLike pUpgradeItem, ItemLike pResult) {
+    protected static void chestLikeUpgrade(RecipeOutput pRecipeOutput, ItemLike pCenterItem, ItemLike pUpgradeItem, ItemLike pResult) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, pResult)
                 .pattern("UUU")
                 .pattern("UCU")
@@ -57,94 +52,18 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('U', pUpgradeItem)
                 .define('C', pCenterItem)
                 .unlockedBy(getHasName(pUpgradeItem), has(pUpgradeItem))
-                .save(pFinishedRecipeConsumer);
+                .save(pRecipeOutput);
     }
 
-    protected static void chestLikeUpgrade(Consumer<FinishedRecipe> pFinishedRecipeConsumer, ItemLike pCenterItem, TagKey<Item> pUpgradeItem, ItemLike pResult) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, pResult)
-                .pattern("UUU")
-                .pattern("UCU")
-                .pattern("UUU")
-                .define('U', pUpgradeItem)
-                .define('C', pCenterItem)
-                //.unlockedBy(getHasName(pUpgradeItem),has(pUpgradeItem))
-                .save(pFinishedRecipeConsumer);
-    }
-
-    protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer,
-                                      List<ItemLike> pIngredients,
-                                      RecipeCategory pCategory,
-                                      ItemLike pResult,
-                                      float pExperience,
-                                      int pCookingTIme,
-                                      String pGroup) {
-        oreCooking(pFinishedRecipeConsumer,
-                RecipeSerializer.SMELTING_RECIPE,
-                pIngredients,
-                pCategory,
-                pResult,
-                pExperience,
-                pCookingTIme,
-                pGroup,
-                "_from_smelting");
-    }
-
-    protected static void oreBlasting(Consumer<FinishedRecipe> pFinishedRecipeConsumer,
-                                      List<ItemLike> pIngredients,
-                                      RecipeCategory pCategory,
-                                      ItemLike pResult,
-                                      float pExperience,
-                                      int pCookingTime,
-                                      String pGroup) {
-        oreCooking(pFinishedRecipeConsumer,
-                RecipeSerializer.BLASTING_RECIPE,
-                pIngredients,
-                pCategory,
-                pResult,
-                pExperience,
-                pCookingTime,
-                pGroup,
-                "_from_blasting");
-    }
-
-    protected static void oreCooking(Consumer<FinishedRecipe> pFinishedRecipeConsumer,
-                                     RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer,
-                                     List<ItemLike> pIngredients,
-                                     RecipeCategory pCategory,
-                                     ItemLike pResult,
-                                     float pExperience,
-                                     int pCookingTime,
-                                     String pGroup,
-                                     String pRecipeName) {
-        Iterator ingredientIterator = pIngredients.iterator();
-
-        while (ingredientIterator.hasNext()) {
-            ItemLike itemlike = (ItemLike) ingredientIterator.next();
-            SimpleCookingRecipeBuilder.generic(Ingredient.of(new ItemLike[]{itemlike}),
-                            pCategory,
-                            pResult,
-                            pExperience,
-                            pCookingTime,
-                            pCookingSerializer
-                    )
-                    .group(pGroup)
-                    .unlockedBy(getHasName(itemlike), has(itemlike))
-                    .save(pFinishedRecipeConsumer,
-                            CraftiCube.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike)
-                    );
-        }
-
-    }
-
-    protected static void netheriteSmithing(Consumer<FinishedRecipe> pFinishedRecipeConsumer, ItemLike pIngredientItem,
+    protected static void netheriteSmithing(RecipeOutput pRecipeOutput, ItemLike pIngredientItem,
                                             RecipeCategory pCategory, ItemLike pResultItem) {
         SmithingTransformRecipeBuilder.smithing(
-                        Ingredient.of(new ItemLike[]{Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE}),
-                        Ingredient.of(new ItemLike[]{pIngredientItem}),
-                        Ingredient.of(new ItemLike[]{Items.NETHERITE_INGOT}),
+                        Ingredient.of(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
+                        Ingredient.of(pIngredientItem),
+                        Ingredient.of(Items.NETHERITE_INGOT),
                         pCategory, pResultItem.asItem())
-                .unlocks("has_netherite_ingot", has((ItemLike) Items.NETHERITE_INGOT))
-                .save(pFinishedRecipeConsumer, CraftiCube.MOD_ID + ":" + getItemName(pResultItem) + "_smithing");
+                .unlocks("has_netherite_ingot", has(Items.NETHERITE_INGOT))
+                .save(pRecipeOutput, CraftiCube.MOD_ID + ":" + getItemName(pResultItem) + "_smithing");
     }
 
 }

@@ -10,8 +10,8 @@ public class NetheriteCrafticubeBlockEntity extends CrafticubeBlockEntity {
         super(ModBlockEntities.NETHERITE_CRAFTICUBE_BE.get(), pPos, pBlockState, 36, 32_000);
     }
 
-    @Override
-    public @NotNull Component getDefaultName() {
-        return Component.translatable("block.crafticube.netherite_crafticube");
-    }
+//    @Override
+//    public @NotNull Component getDefaultName() {
+//        return Component.translatable("block.crafticube.netherite_crafticube");
+//    }
 }
