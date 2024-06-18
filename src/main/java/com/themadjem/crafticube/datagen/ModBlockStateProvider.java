@@ -15,9 +15,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-//        blockWithItem(ModBlocks.CRAFTICUBE);
-
-        //blockWithItem(ModBlocks.IRON_CRAFTICUBE);
         blockWithItem(ModBlocks.IRON_CRAFTICUBE);
         blockWithItem(ModBlocks.GOLD_CRAFTICUBE);
         blockWithItem(ModBlocks.DIAMOND_CRAFTICUBE);

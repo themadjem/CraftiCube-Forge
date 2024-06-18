@@ -16,10 +16,10 @@ public class ModBlockLootTables extends BlockLootSubProvider {
     @Override
     protected void generate() {
 //        this.dropSelf(ModBlocks.CRAFTICUBE.get());
-        this.dropSelf(ModBlocks.IRON_CRAFTICUBE.get());
-        this.dropSelf(ModBlocks.GOLD_CRAFTICUBE.get());
-        this.dropSelf(ModBlocks.DIAMOND_CRAFTICUBE.get());
-        this.dropSelf(ModBlocks.NETHERITE_CRAFTICUBE.get());
+//        this.dropSelf(ModBlocks.IRON_CRAFTICUBE.get());
+//        this.dropSelf(ModBlocks.GOLD_CRAFTICUBE.get());
+//        this.dropSelf(ModBlocks.DIAMOND_CRAFTICUBE.get());
+//        this.dropSelf(ModBlocks.NETHERITE_CRAFTICUBE.get());
     }
 
     @Override
